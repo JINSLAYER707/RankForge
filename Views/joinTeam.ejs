@@ -1,0 +1,79 @@
+<%- include('partials/header') %>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<div class="container join-team-page">
+
+<a href="/contest/<%= contest._id %>" class="back-link">← Back to Contest</a>
+
+<h1 class="join-team-title">Available Teams</h1>
+
+<p class="join-team-subtitle">
+Join an existing team for this contest
+</p>
+
+<div class="teams-grid">
+
+<% if(teams.length > 0){ %>
+
+<% teams.forEach(team => { %>
+
+<div class="team-card">
+
+<h3 class="team-name"><%= team.name %></h3>
+
+<p class="team-leader">
+Leader: <%= team.leader.name %>
+</p>
+
+<div class="team-members">
+
+<strong>Members:</strong>
+
+<% team.members.forEach(member => { %>
+
+<span class="member-badge">
+<%= member.name %>
+</span>
+
+<% }) %>
+
+</div>
+
+<form action="/team/<%= team._id %>/request" method="POST">
+
+<input type="hidden" name="contest_id" value="<%= contest._id %>">
+
+<button class="request-join-btn">
+Request to Join
+</button>
+
+</form>
+
+</div>
+
+<% }) %>
+
+<% } else { %>
+
+<p class="no-teams-text">No teams available yet.</p>
+
+<% } %>
+
+</div>
+
+</div>
+
+<%- include('partials/footer') %>
+
+<script>
+    const button=document.querySelectorAll('.request-join-btn');
+    button.forEach((btn)=>{
+        btn.addEventListener('click', ()=>{
+            btn.textContent="Request Sent";
+            btn.disabled=true;
+            btn.classList.remove('request-join-btn');
+            btn.classList.add('request-sent-btn');
+        })
+    })
+</script>

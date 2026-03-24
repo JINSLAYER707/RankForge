@@ -1,0 +1,245 @@
+<%- include('partials/header') %>
+
+<div class="container contest-details">
+
+<a href="/contest" class="back-link">← Back to contests</a>
+
+<div class="contest-header">
+
+<div>
+
+<h1 class="contest-name">
+<%= contest.title %>
+<span class="status-badge"><%= contest.status %></span>
+</h1>
+
+<p class="contest-host">Hosted by <%= contest.hostedBy.name %></p>
+
+<div class="contest-info">
+
+<span>📅 <%= contest.startDate %> → <%= contest.endDate %></span>
+
+<span>👥 Max <%= contest.maxTeamSize %> per team</span>
+
+<span>🏆 <%= contest.teams.length %> teams</span>
+
+</div>
+
+<div class="problem-section">
+
+<h2>📄 Problem Statement</h2>
+
+<a class="problem-link"
+href="<%= contest.problemStatement %>"
+target="_blank">
+
+📥 View / Download Problem Statement
+
+</a>
+
+</div>
+
+</div>
+
+<% if (contest.status !== "ended") { %>
+<button class="join-btn" onclick="openJoinPopup()">
+👥 Join Contest
+</button>
+<% } %>
+
+</div>
+
+
+<p class="contest-description">
+<%= contest.description %>
+</p>
+
+
+<div class="contest-tabs">
+
+<button class="tab active" data-tab="leaderboard">Leaderboard</button>
+<button class="tab" data-tab="submissions">Submissions</button>
+
+</div>
+
+
+
+<!-- Leaderboard View -->
+
+<div id="leaderboard" class="tab-view active">
+
+<div class="leaderboard-card">
+
+<table class="leaderboard-table">
+
+<thead>
+<tr>
+<th>Rank</th>
+<th>Team</th>
+<th>Members</th>
+<th>Score</th>
+</tr>
+</thead>
+
+<tbody>
+
+<% teams.forEach((team,index)=>{ %>
+
+<tr>
+
+<td class="rank">
+
+<% if(index === 0){ %>
+<span class="gold">#1</span>
+<% } else if(index === 1){ %>
+<span class="silver">#2</span>
+<% } else if(index === 2){ %>
+<span class="bronze">#3</span>
+<% } else { %>
+#<%= index+1 %>
+<% } %>
+
+</td>
+
+<td class="team-name"><%= team.name %></td>
+
+<td class="team-members">
+<%= [team.leader.name, ...team.members
+      .filter(m => m._id.toString() !== team.leader._id.toString())
+      .map(m => m.name)
+    ].join(", ") %>
+</td>
+
+<td class="team-score"><%= team.score %></td>
+
+</tr>
+
+<% }) %>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+
+<!-- Submissions View -->
+
+<div id="submissions" class="tab-view hidden">
+
+<% submissions.forEach(sub => { %>
+
+<div class="submission-card">
+
+<div class="submission-left">
+
+<h3><%= sub.teamName %></h3>
+
+<p class="submission-file">
+<%= sub.fileURL %>
+</p>
+
+</div>
+
+
+<div class="submission-right">
+
+<span class="submission-date">
+<%= sub.submittedAt %>
+</span>
+
+<span class="submission-score">
+
+<% if(sub.score){ %>
+✔ <%= sub.score %>
+<% } else { %>
+Pending
+<% } %>
+
+</span>
+
+</div>
+
+</div>
+
+<% }) %>
+
+</div>
+
+
+</div>
+
+<div id="joinPopup" class="popup-overlay">
+
+<div class="popup-card">
+
+<h2>Join Contest</h2>
+
+<p>Choose how you want to participate</p>
+
+<div class="popup-options">
+
+<a href="/contest/<%= contest._id %>/create-team" class="popup-option">
+Create a Team
+</a>
+
+<a href="/contest/<%= contest._id %>/teams" class="popup-option">
+Join a Team
+</a>
+
+</div>
+
+<button class="popup-close" onclick="closeJoinPopup()">
+Cancel
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const tabs = document.querySelectorAll(".tab");
+const views = document.querySelectorAll(".tab-view");
+
+tabs.forEach(tab => {
+
+tab.addEventListener("click", ()=>{
+
+tabs.forEach(t => t.classList.remove("active"));
+views.forEach(v => v.classList.add("hidden"));
+
+tab.classList.add("active");
+
+const target = tab.dataset.tab;
+
+document.getElementById(target).classList.remove("hidden");
+
+});
+
+});
+
+function openJoinPopup(){
+document.getElementById("joinPopup").style.display = "flex"
+}
+
+function closeJoinPopup(){
+document.getElementById("joinPopup").style.display = "none"
+}
+
+window.onclick = function(event){
+
+const popup = document.getElementById("joinPopup")
+
+if(event.target === popup){
+popup.style.display = "none"
+}
+
+}
+
+</script>
+
+<%- include('partials/footer') %>

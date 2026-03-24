@@ -1,0 +1,258 @@
+<%- include('partials/header') %>
+
+<div class="container contest-details">
+
+<a href="/contest" class="back-link">← Back to contests</a>
+
+<div class="contest-header">
+
+<div>
+
+<h1 class="contest-name">
+<%= contest.title %>
+<span class="status-badge"><%= contest.status %></span>
+</h1>
+
+<p class="contest-host">Hosted by <%= contest.hostedBy.name %></p>
+
+<div class="contest-info">
+
+<span>📅 <%= contest.startDate %> → <%= contest.endDate %></span>
+
+<span>👥 Max <%= contest.maxTeamSize %> per team</span>
+
+<span>🏆 <%= contest.teams.length %> teams</span>
+
+</div>
+
+<div class="problem-section">
+
+<h2>📄 Problem Statement</h2>
+
+<a class="problem-link"
+href="<%= contest.problemStatement %>"
+target="_blank">
+
+📥 View / Download Problem Statement
+
+</a>
+
+</div>
+
+</div>
+
+<% if (contest.status !== "ended") { %>
+
+👥 You are participating 
+
+<% } %>
+
+</div>
+
+<p class="contest-description">
+<%= contest.description %>
+</p>
+
+<div class="contest-tabs">
+<button class="tab active" data-tab="team">My Team</button>
+<button class="tab" data-tab="submissions">My Submissions</button>
+<button class="tab" data-tab="leaderboard">Leaderboard</button>
+</div>
+
+<!-- TEAM TAB -->
+
+<div id="team" class="tab-view active">
+
+<div class="leaderboard-card">
+
+<h3 style="margin-left: 10px;"><%= team.name %></h3>
+
+<p>
+<%= team.members.some(m => m._id.toString() === team.leader._id.toString()) 
+    ? team.members.length 
+    : team.members.length + 1 %> members
+</p>
+
+<!-- Leader -->
+
+<div class="submission-card">
+  <div class="submission-left">
+    <h3><%= team.leader.name %></h3>
+  </div>
+
+  <div class="submission-right">
+    <span class="status-badge">Captain</span>
+  </div>
+</div>
+
+<!-- Members -->
+
+<% team.members.forEach(member => { %>
+
+<% if(member._id.toString() !== team.leader._id.toString()) { %>
+
+
+<div class="submission-card">
+  <div class="submission-left">
+    <h3><%= member.name %></h3>
+  </div>
+</div>
+
+
+<% } %>
+
+<% }) %>
+
+<div class="submission-card">
+<strong>⭐ Current Score: <%= team.score %></strong>
+</div>
+
+</div>
+
+</div>
+
+<!-- SUBMISSIONS TAB -->
+
+<div id="submissions" class="tab-view hidden">
+
+<div style="margin-bottom:20px">
+
+<% if (contest.status === "active") { %>
+
+<form action="/contest/<%= contest._id %>/submit" method="POST" enctype="multipart/form-data">
+<input type="file" name="submissionFile" required>
+<input type="hidden" value="<%= team._id %>" name="teamId">
+
+<button class="join-btn">
+📤 New Submission
+</button>
+</form>
+
+<% } else { %>
+
+<div class="submission-card">
+  <div class="submission-left">
+    <p style="color:#9ca3af;">
+      Submissions are only allowed when the contest is active.
+    </p>
+  </div>
+</div>
+
+<% } %>
+
+</div>
+
+<% submissions.forEach(sub => { %>
+
+<div class="submission-card">
+
+<div class="submission-left">
+<h3>
+<a class="problem-link"
+href="<%= sub.fileURL %>"
+target="_blank" rel="noopener noreferrer">
+Submission
+</a>
+</h3>
+</div>
+
+<div class="submission-right">
+
+<span class="submission-date">
+<%= sub.date %>
+</span>
+
+<span class="submission-score">
+<% if(sub.score){ %>
+✔ <%= sub.score %>
+<% } else { %>
+Pending
+<% } %>
+</span>
+
+</div>
+
+</div>
+
+<% }) %>
+
+</div>
+
+<!-- LEADERBOARD -->
+
+<div id="leaderboard" class="tab-view hidden">
+
+<div class="leaderboard-card">
+
+<table class="leaderboard-table">
+
+<thead>
+<tr>
+<th>Rank</th>
+<th>Team</th>
+<th>Members</th>
+<th>Score</th>
+</tr>
+</thead>
+
+<tbody>
+
+<% teams.forEach((team,index)=>{ %>
+
+<tr>
+
+<td>#<%= index+1 %></td>
+
+<td class="team-name">
+<%= team.name %>
+
+<% if(team._id.toString() === myTeamId.toString()){ %> <span class="status-badge">You</span>
+<% } %>
+
+</td>
+
+<td>
+<%= [team.leader.name, ...team.members
+      .filter(m => m._id.toString() !== team.leader._id.toString())
+      .map(m => m.name)
+    ].join(", ") %>
+</td>
+
+<td><%= team.score %></td>
+
+</tr>
+
+<% }) %>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const tabs = document.querySelectorAll(".tab");
+const views = document.querySelectorAll(".tab-view");
+
+tabs.forEach(tab => {
+  tab.addEventListener("click", ()=>{
+
+    tabs.forEach(t => t.classList.remove("active"));
+    views.forEach(v => v.classList.add("hidden"));
+
+    tab.classList.add("active");
+
+    const target = tab.dataset.tab;
+    document.getElementById(target).classList.remove("hidden");
+
+  });
+});
+
+</script>
+
+<%- include('partials/footer') %>

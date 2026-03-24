@@ -1,0 +1,92 @@
+<%- include('partials/header') %>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<div class="container team-page">
+
+<a href="/contest/<%= contest._id %>" class="back-link">← Back to Contest</a>
+
+<div class="team-card">
+
+<h2>Create Team</h2>
+
+<p class="team-subtitle">
+Max Team Size: <%= contest.maxTeamSize %>
+</p>
+
+<form action="/contest/<%= contest._id %>/create-team" method="POST">
+
+<input type="hidden" name="contest_id" value="<%= contest._id %>">
+
+<!-- TEAM NAME -->
+
+<div class="form-group">
+
+<label>Team Name</label>
+
+<input
+type="text"
+name="teamName"
+placeholder="Enter team name"
+required
+
+>
+
+</div>
+
+<!-- MEMBER FIELDS -->
+
+<h3 class="member-section-title">Team Members</h3>
+
+<!-- LEADER FIELD -->
+
+<div class="form-group">
+
+<label>Member 1 (Leader)</label>
+
+<input
+type="text"
+value="<%= user.name %>"
+disabled
+
+>
+
+<input
+type="hidden"
+name="members[]"
+value="<%= user._id %>"
+
+>
+
+</div>
+
+<!-- OTHER MEMBERS -->
+
+<% for(let i = 2; i <= contest.maxTeamSize; i++){ %>
+
+<div class="form-group">
+
+<label>Member <%= i %></label>
+
+<input
+type="text"
+name="members[]"
+placeholder="Enter email"
+
+>
+
+</div>
+
+<% } %>
+
+<button type="submit" class="create-team-btn">
+Create Team
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<%- include('partials/footer') %>

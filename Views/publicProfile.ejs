@@ -1,0 +1,192 @@
+<link rel="stylesheet" href="/css/style.css">
+
+<div class="profile-wrapper">
+
+<a href="/people" class="back-link">← Back</a>
+
+<!-- PROFILE HEADER CARD -->
+
+<div class="profile-header-card">
+
+    <div class="avatar">
+        <%= user.name.charAt(0).toUpperCase() %>
+    </div>
+
+    <div class="profile-info">
+        <h2><%= user.name %></h2>
+        <p><%= user.email %></p>
+        <p>Joined: <%= new Date(user.createdAt).toDateString() %></p>
+
+        <span class="points-badge">
+            ⭐ <%= user.points %> Points
+        </span>
+
+        <!-- ADD FRIEND BUTTON -->
+        <% if(currentUser && currentUser._id.toString() !== user._id.toString()) { %>
+            
+            <% if(!user.friends.some(f => f.toString() === currentUser._id.toString())) { %>
+                <form action="/friends/<%= user._id %>" method="POST">
+                    <button type="submit" class="add-friend-btn">➕ Add Friend</button>
+                </form>
+            <% } else { %>
+                <button class="add-friend-btn added" disabled>✔ Friends</button>
+            <% } %>
+
+        <% } %>
+
+    </div>
+
+</div>
+
+
+
+<!-- STATS -->
+
+<div class="stats-row">
+
+    <div class="stat-card">
+        <div class="stat-number"><%= user.points %></div>
+        <div class="stat-label">Points</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-number"><%= user.hostedContests.length %></div>
+        <div class="stat-label">Hosted</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-number"><%= user.participatedContests.length %></div>
+        <div class="stat-label">Participated</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-number"><%= user.friends.length %></div>
+        <div class="stat-label">Friends</div>
+    </div>
+
+</div>
+
+
+
+<!-- SOCIAL CARD -->
+
+<div class="social-card">
+
+<h3>Activity</h3>
+
+<div class="social-tabs">
+    <button class="social-tab active" onclick="showTab('hosted', this)">Hosted</button>
+    <button class="social-tab" onclick="showTab('participated', this)">Participations</button>
+    <button class="social-tab" onclick="showTab('friends', this)">Friends</button>
+</div>
+
+
+
+<!-- HOSTED -->
+
+<div id="hosted" class="social-content active">
+
+    <% if(user.hostedContests.length > 0){ %>
+
+        <% user.hostedContests.forEach(contest => { %>
+
+            <div class="user-row">
+                <div class="avatar-small">C</div>
+                <span><%= contest.name %></span>
+
+                <span style="margin-left:auto;color:#9fb3c8;">
+                    <%= new Date(contest.startDate).toDateString() %>
+                </span>
+            </div>
+
+        <% }) %>
+
+    <% } else { %>
+
+        <p>No contests hosted.</p>
+
+    <% } %>
+
+</div>
+
+
+
+<!-- PARTICIPATED -->
+
+<div id="participated" class="social-content">
+
+    <% if(user.participatedContests.length > 0){ %>
+
+        <% user.participatedContests.forEach(contest => { %>
+
+            <div class="user-row">
+                <div class="avatar-small">C</div>
+                <span><%= contest.name %></span>
+
+                <span style="margin-left:auto;color:#9fb3c8;">
+                    <%= new Date(contest.startDate).toDateString() %>
+                </span>
+            </div>
+
+        <% }) %>
+
+    <% } else { %>
+
+        <p>No participations yet.</p>
+
+    <% } %>
+
+</div>
+
+
+
+<!-- FRIENDS -->
+
+<div id="friends" class="social-content">
+
+    <% if(user.friends.length > 0){ %>
+
+        <% user.friends.forEach(friend => { %>
+
+            <a href="/profile/<%= friend._id %>" class="user-row">
+
+                <div class="avatar-small">
+                    <%= friend.name.charAt(0).toUpperCase() %>
+                </div>
+
+                <span><%= friend.name %></span>
+
+            </a>
+
+        <% }) %>
+
+    <% } else { %>
+
+        <p>No friends yet.</p>
+
+    <% } %>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+function showTab(tabId, element){
+
+    const tabs = document.querySelectorAll(".social-content")
+    const buttons = document.querySelectorAll(".social-tab")
+
+    tabs.forEach(tab => tab.classList.remove("active"))
+    buttons.forEach(btn => btn.classList.remove("active"))
+
+    document.getElementById(tabId).classList.add("active")
+    element.classList.add("active")
+
+}
+
+</script>

@@ -1,0 +1,76 @@
+<%- include('partials/header') %>
+
+<div class="container contests-page">
+
+<div class="page-header">
+<h1>People</h1>
+<p>Connect with other competitors</p>
+</div>
+
+<div class="contest-controls">
+
+<form class="contest-search" action="/people" method="POST">
+<input
+type="text"
+class="contest-search"
+name="name"
+placeholder="Search people..."
+>
+</form>
+
+</div>
+
+
+<!-- Only show results if search returned people -->
+
+<% if (people && people.length > 0) { %>
+
+<div class="contest-grid">
+
+<% people.forEach(person => { %>
+
+<form action="/profile/<%= person._id %>" method="GET" class="contest-form">
+
+<button type="submit" class="contest-card">
+
+<div class="contest-top">
+<span class="category">
+Competitor
+</span>
+</div>
+
+<h3 class="contest-title">
+<%= person.name %>
+</h3>
+
+<p class="contest-description">
+<%= person.bio || "Competitive programmer on the platform." %>
+</p>
+
+<div class="contest-meta">
+
+<span>📧 <%= person.email %></span>
+
+<span>🏆 <%= person.participatedContests.length || 0 %> contests</span>
+
+<span>⭐ Points: <%= person.points || "None" %></span>
+
+</div>
+
+<p class="contest-host">
+View Profile →
+</p>
+
+</button>
+
+</form>
+
+<% }) %>
+
+</div>
+
+<% } %>
+
+</div>
+
+<%- include('partials/footer') %>

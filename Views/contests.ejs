@@ -1,0 +1,121 @@
+<%- include('partials/header') %>
+
+<div class="container contests-page">
+
+<div class="page-header">
+<h1>Contests</h1>
+<p>Browse and join competitions</p>
+</div>
+
+<div class="contest-controls">
+
+<form class="contest-search" action="/contest" method="POST">
+<input
+type="text"
+class="contest-search"
+name="name"
+placeholder="Search contests..."
+>
+</form>
+
+
+<div class="contest-filters">
+
+<button class="filter active" data-filter="all">All</button>
+
+<button class="filter" data-filter="active">Active</button>
+
+<button class="filter" data-filter="upcoming">Upcoming</button>
+
+<button class="filter" data-filter="ended">Ended</button>
+
+</div>
+
+</div>
+
+
+<div class="contest-grid">
+
+<% contests.forEach(contest => { %>
+
+<form action="/contest/<%= contest._id %>" method="GET" class="contest-form">
+
+<input type="hidden" name="contest_id" value="<%= contest._id %>">
+
+<button type="submit" class="contest-card" data-status="<%= contest.status.toLowerCase() %>">
+
+<div class="contest-top">
+
+<span class="status <%= contest.status.toLowerCase() %>">
+<%= contest.status %>
+</span>
+
+<span class="category">
+<%= contest.category %>
+</span>
+
+</div>
+
+<h3 class="contest-title">
+<%= contest.name %>
+</h3>
+
+<p class="contest-description">
+<%= contest.description %>
+</p>
+
+<div class="contest-meta">
+
+<span>👥 <%= contest.teams.length %> teams</span>
+<span>📅 Start: <%= contest.startDate %></span>
+<span>📅 End: <%= contest.endDate %></span>
+
+</div>
+
+<p class="contest-host">
+Hosted by <%= contest.hostedBy.name %>
+</p>
+
+</button>
+
+</form>
+
+<% }) %>
+
+</div>
+
+<script>
+
+const buttons = document.querySelectorAll('.filter');
+const cards = document.querySelectorAll('.contest-card');
+
+buttons.forEach((button) => {
+
+button.addEventListener('click', ()=>{
+
+buttons.forEach((btn)=>{
+btn.classList.remove('active');
+});
+
+button.classList.add('active');
+
+const filter = button.getAttribute('data-filter');
+
+cards.forEach((card)=>{
+
+if(filter === 'all' || card.dataset.status === filter){
+card.style.display = 'block';
+}
+else{
+card.style.display = 'none';
+}
+
+})
+
+})
+
+})
+
+</script>
+
+<%- include('partials/footer') %>

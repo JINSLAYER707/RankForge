@@ -1,0 +1,229 @@
+<link rel="stylesheet" href="/css/style.css">
+
+<div class="profile-wrapper">
+
+<a href="/home" class="back-link">← Back</a>
+
+<h2>Invitations</h2>
+
+<div class="social-tabs">
+
+<button class="social-tab active" onclick="showPrimaryTab('friends',this)">
+Friend Invitations
+</button>
+
+<button class="social-tab" onclick="showPrimaryTab('contest',this)">
+Contest Invitations
+</button>
+
+</div>
+
+
+<!-- ================= FRIEND INVITES ================= -->
+
+<div id="friends" class="social-content active">
+
+<div class="sub-tabs">
+
+<button class="sub-tab active" onclick="showSubTab('friend-received',this)">
+Received (<%= user.incomingRequests.length %>)
+</button>
+
+<button class="sub-tab" onclick="showSubTab('friend-sent',this)">
+Sent (<%= user.outgoingRequests.length %>)
+</button>
+
+</div>
+
+
+<!-- RECEIVED FRIEND REQUESTS -->
+
+<div id="friend-received" class="sub-content active">
+
+<% if(user.incomingRequests.length === 0){ %>
+<p>No incoming friend requests.</p>
+<% } %>
+
+<% user.incomingRequests.forEach(user => { %>
+
+<div class="user-row">
+
+<div class="avatar-small">
+<%= user.name.charAt(0).toUpperCase() %>
+</div>
+
+<span><%= user.name %></span>
+
+<div class="request-actions">
+
+<form action="/friends/accept/<%= user._id %>" method="POST">
+<button class="accept-btn">Accept</button>
+</form>
+
+<form action="/friends/reject/<%= user._id %>" method="POST">
+<button class="reject-btn">Reject</button>
+</form>
+
+</div>
+
+</div>
+
+<% }) %>
+
+</div>
+
+
+<!-- SENT FRIEND REQUESTS -->
+
+<div id="friend-sent" class="sub-content">
+
+<% if(user.outgoingRequests.length === 0){ %>
+<p>No sent friend requests.</p>
+<% } %>
+
+<% user.outgoingRequests.forEach(user => { %>
+
+<div class="user-row">
+
+<div class="avatar-small">
+<%= user.name.charAt(0).toUpperCase() %>
+</div>
+
+<span><%= user.name %></span>
+
+<span class="pending">Pending</span>
+
+</div>
+
+<% }) %>
+
+</div>
+
+</div>
+
+
+<!-- ================= CONTEST INVITES ================= -->
+
+<div id="contest" class="social-content">
+
+<div class="sub-tabs">
+
+<button class="sub-tab active" onclick="showSubTab('contest-received',this)">
+Received (<%= user.inviteRequests.length %>)
+</button>
+
+<button class="sub-tab" onclick="showSubTab('contest-sent',this)">
+Sent (<%= user.joinRequests.length %>)
+</button>
+
+</div>
+
+
+<!-- RECEIVED CONTEST INVITES -->
+
+<div id="contest-received" class="sub-content active">
+
+<% if(user.inviteRequests.length === 0){ %>
+<p>No contest invitations.</p>
+<% } %>
+
+<% user.inviteRequests.forEach(invite => { %>
+
+<div class="contest-row">
+
+<div class="contest-info">
+
+<h4><%= invite.contest.name %></h4>
+
+<p>
+Invited by <b><%= invite.user.name %></b>
+</p>
+
+</div>
+
+<div class="request-actions">
+
+<form action="/teams/accept/<%= invite.team %>" method="POST">
+<input type="hidden" name="contest_id" value="<%= invite.contest._id %>">
+<button class="accept-btn">Accept</button>
+</form>
+
+<form action="/teams/reject/<%= invite.team %>" method="POST">
+<input type="hidden" name="contest_id" value="<%= invite.contest._id %>">
+<button class="reject-btn">Reject</button>
+</form>
+
+</div>
+
+</div>
+
+<% }) %>
+
+</div>
+
+
+<!-- SENT CONTEST INVITES -->
+
+<div id="contest-sent" class="sub-content">
+
+<% if(user.joinRequests.length === 0){ %>
+<p>No contest invitations sent.</p>
+<% } %>
+
+<% user.joinRequests.forEach(invite => { %>
+
+<div class="contest-row">
+
+<div class="contest-info">
+
+<h4><%= invite.contest.name %></h4>
+
+<p>
+Sent to team <b><%= invite.team.name %></b>
+</p>
+
+</div>
+
+<span class="pending">Pending</span>
+
+</div>
+
+<% }) %>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function showPrimaryTab(id,btn){
+
+document.querySelectorAll(".social-content")
+.forEach(el=>el.classList.remove("active"))
+
+document.querySelectorAll(".social-tab")
+.forEach(el=>el.classList.remove("active"))
+
+document.getElementById(id).classList.add("active")
+btn.classList.add("active")
+
+}
+
+function showSubTab(id,btn){
+
+const parent = btn.closest(".social-content")
+
+parent.querySelectorAll(".sub-content")
+.forEach(el=>el.classList.remove("active"))
+
+parent.querySelectorAll(".sub-tab")
+.forEach(el=>el.classList.remove("active"))
+
+parent.querySelector("#"+id).classList.add("active")
+btn.classList.add("active")
+
+}
+
+</script>

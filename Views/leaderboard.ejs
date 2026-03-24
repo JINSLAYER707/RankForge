@@ -1,0 +1,44 @@
+<%- include('partials/header') %>
+
+<div class="container">
+
+<h1>Leaderboard</h1>
+
+<div class="podium">
+
+<div class="rank-box rank2">
+#2 <br> <%= second ? second.name : "-" %>
+</div>
+
+<div class="rank-box rank1">
+#1 <br> <%= first ? first.name : "-" %>
+</div>
+
+<div class="rank-box rank3">
+#3 <br> <%= third ? third.name : "-" %>
+</div>
+
+</div>
+
+<table class="table">
+
+<tr>
+<th>Rank</th>
+<th>User</th>
+<th>Score</th>
+</tr>
+<% let i=1; %>
+<% users.forEach(user => { %>
+
+<tr>
+<td><%= i %></td>
+<td><%= user.name %></td>
+<td><%= user.points %></td>
+
+</tr>
+
+<% i++;}) %>
+
+</table>
+
+</div>

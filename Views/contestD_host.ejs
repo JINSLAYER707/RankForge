@@ -1,0 +1,246 @@
+<%- include('partials/header') %>
+
+<div class="container contest-details">
+
+<a href="/contest" class="back-link">← Back to contests</a>
+
+<div class="contest-header">
+
+<div>
+
+<h1 class="contest-name">
+<%= contest.title %>
+<span class="status-badge"><%= contest.status %></span>
+</h1>
+
+<p class="contest-host">Hosted by <%= contest.hostedBy.name %></p>
+
+<div class="contest-info">
+
+<span>📅 <%= contest.startDate %> → <%= contest.endDate %></span>
+
+<span>👥 Max <%= contest.maxTeamSize %> per team</span>
+
+<span>🏆 <%= contest.teams.length %> teams</span>
+
+</div>
+
+<div class="problem-section">
+
+<h2>📄 Problem Statement</h2>
+
+<a class="problem-link"
+href="<%= contest.problemStatement %>"
+target="_blank">
+
+📥 View / Download Problem Statement
+
+</a>
+
+</div>
+
+</div>
+<button class="join-btn">
+<a href="/contest/<% contest._id %> /manage">Manage Contest</a>
+</button>
+
+</div>
+
+<p class="contest-description">
+<%= contest.description %>
+</p>
+
+<div class="contest-tabs">
+<button class="tab active" data-tab="overview">Overview</button>
+<button class="tab" data-tab="teams">Teams</button>
+<button class="tab" data-tab="reviews">Review Submissions</button>
+<button class="tab" data-tab="leaderboard">Leaderboard</button>
+</div>
+
+<!-- OVERVIEW -->
+
+<div id="overview" class="tab-view active">
+<div class="leaderboard-card">
+<p><strong>Teams:</strong> <%= contest.totalTeams %></p>
+<p><strong>Total Participants:</strong> <%= totalParticipants %></p>
+<p><strong>Submissions:</strong> <%= submissions.length %></p>
+<p><strong>Evaluated:</strong> <%= evaluatedCount %></p>
+<p><strong>Pending Review:</strong> <%= pendingCount %></p>
+</div>
+</div>
+
+<!-- TEAMS -->
+
+<div id="teams" class="tab-view hidden">
+
+<% teams.forEach(team => { %>
+
+<div class="submission-card">
+
+<div class="submission-left">
+
+<h3><%= team.name %></h3>
+
+<p>
+<strong>Members:</strong>
+<%= [team.leader.name, ...team.members
+      .filter(m => m._id.toString() !== team.leader._id.toString())
+      .map(m => m.name)
+    ].join(", ") %>
+</p>
+
+</div>
+
+<div class="submission-right">
+<span>Score: <%= team.score %></span>
+</div>
+
+</div>
+
+<% }) %>
+
+</div>
+
+<!-- REVIEW SUBMISSIONS -->
+
+<div id="reviews" class="tab-view hidden">
+
+<% submissions.forEach(sub => { %>
+
+<% if(sub){ %>
+
+<%
+const team = teams.find(t =>
+t._id.toString() === sub.teamId?.toString()
+);
+%>
+
+<div class="submission-card">
+
+<div class="submission-left">
+
+<h3><%= team ? team.name : "Unknown Team" %></h3>
+
+<p>
+<a class="problem-link" 
+href="<%= sub.fileURL %>" 
+target="_blank">
+Submission
+</a>
+</p>
+
+</div>
+
+<div class="submission-right">
+
+<% if(sub.score !== null && sub.score !== undefined){ %>
+
+<span class="submission-score">Scored: <%= sub.score %></span>
+
+<% } else { %>
+
+<form action="/contest/<%= contest._id %>/score/<%= sub._id %>" method="POST">
+
+<input
+type="number"
+name="score"
+min="0"
+max="100"
+placeholder="0-100"
+required
+
+>
+
+<button class="join-btn">
+Submit Score
+</button>
+
+</form>
+
+<% } %>
+
+</div>
+
+</div>
+
+<% } %>
+
+<% }) %>
+
+</div>
+
+<!-- LEADERBOARD -->
+
+<div id="leaderboard" class="tab-view hidden">
+
+<div class="leaderboard-card">
+
+<table class="leaderboard-table">
+
+<thead>
+<tr>
+<th>Rank</th>
+<th>Team</th>
+<th>Members</th>
+<th>Score</th>
+</tr>
+</thead>
+
+<tbody>
+
+<% teams.forEach((team,index)=>{ %>
+
+<tr>
+
+<td>#<%= index+1 %></td>
+
+<td><%= team.name %></td>
+
+<td>
+<%= [team.leader.name, ...team.members
+      .filter(m => m._id.toString() !== team.leader._id.toString())
+      .map(m => m.name)
+    ].join(", ") %>
+</td>
+
+<td><%= team.score %></td>
+
+</tr>
+
+<% }) %>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const tabs = document.querySelectorAll(".tab");
+const views = document.querySelectorAll(".tab-view");
+
+tabs.forEach(tab => {
+
+tab.addEventListener("click", ()=>{
+
+tabs.forEach(t => t.classList.remove("active"));
+views.forEach(v => v.classList.add("hidden"));
+
+tab.classList.add("active");
+
+const target = tab.dataset.tab;
+
+document.getElementById(target).classList.remove("hidden");
+
+});
+
+});
+
+</script>
+
+<%- include('partials/footer') %>
