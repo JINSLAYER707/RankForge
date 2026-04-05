@@ -4,6 +4,9 @@ const express=require('express');
 const mongoose=require('mongoose');
 const ejs=require('ejs');
 const session=require('express-session');
+const {Server}=require('socket.io');
+const http=require('http');
+const {createServer}=require('http');
 const {loginRouter}=require('./Controller/login');
 const {signupRouter}=require('./Controller/signup');
 const {homeRouter}=require('./Controller/home');
@@ -12,8 +15,12 @@ const {leaderboardRouter}=require('./Controller/leaderboard');
 const {hostRouter}=require('./Controller/hostContest');
 const {profileRouter}=require('./Controller/profile');
 const {peopleRouter}=require('./Controller/people');
+const {dmRouter}=require('./Controller/dm');
+const {ThreadRouter}=require('./Controller/Thread');
+const chatSocket=require('./Sockets/chat.socket');
 const app=express();
-
+const server=createServer(app);
+const io=new Server(server);
 const port=Number(process.env.PORT) || 5000;
 const mongoURL=process.env.MONGO_URL;
 
@@ -36,7 +43,9 @@ app.use('/',leaderboardRouter);
 app.use('/',hostRouter);
 app.use('/',profileRouter);
 app.use('/',peopleRouter);
-
+app.use('/',dmRouter);
+app.use('/',ThreadRouter);
+chatSocket(io);
 mongoose.connect(mongoURL).then(()=>{
    console.log("Connected to MongoDB successfully");
 
@@ -44,7 +53,8 @@ mongoose.connect(mongoURL).then(()=>{
     console.error("Failed to connect to MongoDB",err);
 })
 
- app.listen(port,()=>{
+
+server.listen(port,()=>{
     console.log(`Server is running on http://localhost:${port}`);
 
  }

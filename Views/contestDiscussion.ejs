@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contest Discussion</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="container discussion-page">
+<a href="/contest/<%= contestId %>" class="back-link">← Back to contest</a>
+  <!-- HEADER -->
+  <div class="discussion-header">
+    <h2>Discussion Forum</h2>
+   <a href="/thread/new/<%= contestId %>" class="create-thread-btn">
+  + Create Thread
+</a>
+  </div>
+
+  <!-- CREATE THREAD FORM -->
+  <div id="threadForm" class="thread-form" style="display:none;">
+    <form action="/thread/create" method="POST">
+      <input type="hidden" name="contestId" value="<%= contestId %>">
+
+      <input type="text" name="title" placeholder="Thread title..." required>
+
+      <textarea name="content" placeholder="Write your question or discussion..." required></textarea>
+
+      <button type="submit">Post</button>
+    </form>
+  </div>
+
+  <!-- THREAD LIST -->
+  <div class="thread-list">
+
+    <% if (threads.length === 0) { %>
+      <p>No discussions yet. Start one!</p>
+    <% } %>
+
+    <% threads.forEach(thread => { %>
+      <a href="/thread/<%= thread._id %>" class="thread-card">
+
+        <div class="thread-title">
+          <%= thread.title %>
+        </div>
+
+        <div class="thread-meta">
+          <span>By <%= thread.author.name %></span>
+          <span>
+            <%= new Date(thread.createdAt).toLocaleString() %>
+          </span>
+        </div>
+
+      </a>
+    <% }) %>
+
+  </div>
+
+</div>
+
+<script>
+  function toggleForm() {
+    const form = document.getElementById('threadForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  }
+</script>
+
+</body>
+</html>

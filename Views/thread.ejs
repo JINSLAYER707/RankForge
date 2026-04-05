@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= thread.title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="container thread-page">
+<a href="/contest/<%= thread.contest %>/discussions" class="back-link">← Back to discussions</a>
+  <!-- THREAD -->
+  <div class="thread-main">
+    <h2><%= thread.title %></h2>
+
+    <div class="thread-meta">
+      <span>By <%= thread.author.name %></span>
+      <span><%= new Date(thread.createdAt).toLocaleString() %></span>
+    </div>
+
+    <p class="thread-content"><%= thread.content %></p>
+  </div>
+
+  <!-- REPLIES -->
+  <div class="replies-section">
+    <h3>Replies</h3>
+
+    <% if (replies.length === 0) { %>
+      <p>No replies yet. Be the first to respond.</p>
+    <% } %>
+
+    <% replies.forEach(reply => { %>
+      <div class="reply-card">
+        <div class="reply-meta">
+          <strong><%= reply.author.name %></strong>
+          <span><%= new Date(reply.createdAt).toLocaleString() %></span>
+        </div>
+
+        <p><%= reply.content %></p>
+      </div>
+    <% }) %>
+  </div>
+
+  <!-- ADD REPLY -->
+  <div class="reply-box">
+    <form action="/reply/create" method="POST">
+
+      <input type="hidden" name="threadId" value="<%= thread._id %>">
+
+      <textarea 
+        name="content" 
+        placeholder="Write your reply..." 
+        required
+      ></textarea>
+
+      <button type="submit">Reply</button>
+    </form>
+  </div>
+
+</div>
+
+</body>
+</html>

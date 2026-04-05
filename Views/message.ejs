@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Messages</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<div class="container dm-page">
+<a href="/home" class="back-link">← Back to home</a>
+  <!-- LEFT SIDEBAR -->
+  <div class="dm-sidebar">
+
+    <div class="dm-header">
+      <h2>Messages</h2>
+
+      <div class="dm-tabs">
+        <button class="tab-btn active" id="friendsTabBtn" onclick="showTab('friends', this)">Friends</button>
+        <button class="tab-btn" id="groupsTabBtn" onclick="showTab('groups', this)">Groups</button>
+      </div>
+
+      <input type="text" placeholder="Search chats..." class="dm-search" />
+    </div>
+
+    <!-- FRIENDS TAB -->
+    <div class="dm-users" id="friendsTab">
+      <% conversations.forEach(conv => { %>
+        <a href="/message/<%= conv.friendId %>"
+           class="dm-user <%= (otherUser && otherUser._id.toString() === conv.friendId.toString()) ? 'active' : '' %>">
+
+          <div class="avatar-small">
+            <%= conv.friendName.charAt(0).toUpperCase() %>
+          </div>
+
+          <div>
+            <p class="dm-name"><%= conv.friendName %></p>
+            <span class="dm-preview">
+              <%= conv.lastMessage ? conv.lastMessage.message : "No messages yet" %>
+            </span>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+
+    <!-- GROUPS TAB -->
+    <div class="dm-users" id="groupsTab" style="display:none;">
+      <div class="group-create-wrap">
+        <button class="create-group-btn" onclick="openGroupModal()">+ Create Group</button>
+      </div>
+
+      <% groups.forEach(group => { %>
+        <a href="/group/<%= group._id %>"
+           class="dm-user <%= (groupChat && groupChat._id.toString() === group._id.toString()) ? 'active' : '' %>">
+
+          <div class="avatar-small">
+            <%= group.name.charAt(0).toUpperCase() %>
+          </div>
+
+          <div>
+            <p class="dm-name"><%= group.name %></p>
+            <span class="dm-preview">
+              <% if (group.lastMessage) { %>
+                <%= group.lastMessage.senderName %>: <%= group.lastMessage.message %>
+              <% } else { %>
+                No messages yet
+              <% } %>
+            </span>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+
+  </div>
+
+  <!-- RIGHT CHAT PANEL -->
+  <div class="dm-chat">
+
+    <% if (otherUser) { %>
+
+      <!-- FRIEND CHAT HEADER -->
+      <div class="dm-chat-header">
+        <div class="avatar-small">
+          <%= otherUser.name.charAt(0).toUpperCase() %>
+        </div>
+        <h3><%= otherUser.name %></h3>
+      </div>
+
+      <!-- FRIEND CHAT MESSAGES -->
+      <div class="dm-messages" id="messagesContainer">
+        <% if (messages) { %>
+          <% messages.forEach(msg => { %>
+            <div class="message <%= msg.sender.toString() === userId ? 'sent' : 'received' %>">
+              <p><%= msg.message %></p>
+              <span><%= new Date(msg.timestamp || msg.createdAt).toLocaleTimeString() %></span>
+
+              <% if (msg.sender.toString() === userId) { %>
+                <a href="/delete/message/<%= msg._id %>" style="font-size:10px;color:#f87171;">
+                  Delete
+                </a>
+              <% } %>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+
+      <!-- FRIEND CHAT INPUT -->
+      <div class="dm-input">
+        <input type="text" placeholder="Type a message..." id="messageInput" />
+        <button id="sendBtn">Send</button>
+      </div>
+
+    <% } else if (groupChat) { %>
+
+      <!-- GROUP CHAT HEADER -->
+      <div class="dm-chat-header">
+        <div class="avatar-small">
+          <%= groupChat.name.charAt(0).toUpperCase() %>
+        </div>
+        <h3><%= groupChat.name %></h3>
+      </div>
+
+      <!-- GROUP CHAT MESSAGES -->
+      <div class="dm-messages" id="messagesContainer">
+        <% if (messages) { %>
+          <% messages.forEach(msg => { %>
+            <div class="message <%= msg.sender._id.toString() === userId ? 'sent' : 'received' %>">
+              <% if (msg.sender._id.toString() !== userId) { %>
+                <strong style="font-size:12px;"><%= msg.sender.name %></strong>
+              <% } %>
+
+              <p><%= msg.message %></p>
+              <span><%= new Date(msg.timestamp || msg.createdAt).toLocaleTimeString() %></span>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+
+      <!-- GROUP CHAT INPUT -->
+      <div class="dm-input">
+        <input type="text" placeholder="Type a message..." id="messageInput" />
+        <button id="sendBtn">Send</button>
+      </div>
+
+    <% } else { %>
+
+      <!-- EMPTY STATE -->
+      <div class="dm-empty-state">
+        <img
+          src="https://static.vecteezy.com/system/resources/thumbnails/006/692/321/small/chatting-message-icon-template-black-color-editable-chatting-message-icon-symbol-flat-illustration-for-graphic-and-web-design-free-vector.jpg"
+          class="empty-img"
+        />
+        <h3>Select a conversation</h3>
+        <p>Choose a friend or a group from the left to start chatting</p>
+      </div>
+
+    <% } %>
+
+  </div>
+</div>
+
+<!-- CREATE GROUP MODAL -->
+<div id="groupModal" class="group-modal" style="display:none;">
+  <div class="group-modal-content">
+    <h3>Create Group</h3>
+
+    <input type="text" id="groupName" class="group-name-input" placeholder="Enter group name" />
+
+    <div class="group-friends-list">
+      <% friends.forEach(friend => { %>
+        <label class="group-friend-item">
+          <input type="checkbox" value="<%= friend._id %>" class="group-member-checkbox" />
+          <span><%= friend.name %></span>
+        </label>
+      <% }) %>
+    </div>
+
+    <div class="group-modal-actions">
+      <button onclick="createGroup()" class="group-submit-btn">Create</button>
+      <button onclick="closeGroupModal()" class="group-cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  const currentUserId = '<%= userId %>';
+  const otherUserId = '<%= otherUser ? otherUser._id : "" %>';
+  const currentGroupId = '<%= groupChat ? groupChat._id : "" %>';
+</script>
+
+<script>
+  function showTab(tab, btn) {
+    document.getElementById('friendsTab').style.display = tab === 'friends' ? 'block' : 'none';
+    document.getElementById('groupsTab').style.display = tab === 'groups' ? 'block' : 'none';
+
+    document.querySelectorAll('.tab-btn').forEach(button => {
+      button.classList.remove('active');
+    });
+
+    btn.classList.add('active');
+  }
+
+  function openGroupModal() {
+    document.getElementById('groupModal').style.display = 'flex';
+  }
+
+  function closeGroupModal() {
+    document.getElementById('groupModal').style.display = 'none';
+  }
+
+  async function createGroup() {
+    const name = document.getElementById('groupName').value.trim();
+
+    const selectedMembers = Array.from(
+      document.querySelectorAll('.group-member-checkbox:checked')
+    ).map(cb => cb.value);
+
+    if (!name) {
+      alert('Please enter a group name');
+      return;
+    }
+
+    if (selectedMembers.length === 0) {
+      alert('Please select at least one friend');
+      return;
+    }
+
+    try {
+      const res = await fetch('/groups/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name,
+          members: selectedMembers
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        window.location.href = `/group/${data.group._id}`;
+      } else {
+        alert(data.message || 'Failed to create group');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong');
+    }
+  }
+
+  if (currentGroupId) {
+    document.getElementById('friendsTab').style.display = 'none';
+    document.getElementById('groupsTab').style.display = 'block';
+    document.getElementById('friendsTabBtn').classList.remove('active');
+    document.getElementById('groupsTabBtn').classList.add('active');
+  }
+</script>
+
+<script src="/js/chat.js"></script>
+</body>
+</html>

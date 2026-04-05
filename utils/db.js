@@ -244,6 +244,101 @@ const userSchema = new mongoose.Schema({
     inviteRequests: [joinRequestSchema]
 });
 
+const messageSchema = new mongoose.Schema({
+    sender : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+    receiver: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+    message:{
+        type: String,
+        required: true
+    },
+    timestamp:{
+        type: Date,
+        default: Date.now
+    }
+
+})
+const groupMessageSchema = new mongoose.Schema({
+    sender : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+    group : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Group",
+        required: true
+    },
+    message:{
+        type: String,
+        required: true
+    },
+    timestamp:{
+        type: Date,
+        default: Date.now
+    }
+})
+const groupSchema = new mongoose.Schema({
+    name : {
+        type: String,
+        required: true
+    },
+    members :[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"User",
+            required: true
+        }
+
+    ],
+
+})
+
+const ThreadSchema=new mongoose.Schema({
+    contest:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"Contest",
+        required: true
+    },
+    author:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:true
+    },
+    title:{
+        type: String,
+        required: true
+    },
+    content:{
+        type: String,
+        required: true
+    }
+},{timestamps: true});
+
+const ThreadReplySchema=new mongoose.Schema({
+    thread:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"Thread",
+        required: true
+    },
+    author:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:true
+    },
+    content:{
+        type: String,
+        required: true
+    }
+}, {timestamps: true});
+
 
 // EXPORT MODELS
 
@@ -253,6 +348,16 @@ module.exports = {
 
     Contest: mongoose.model("Contest", contestSchema),
 
-    Submission: mongoose.model("Submission", submissionSchema)
+    Submission: mongoose.model("Submission", submissionSchema),
+
+    Message: mongoose.model("Message" , messageSchema),
+
+    Group: mongoose.model("Group", groupSchema),
+
+    GroupMessage: mongoose.model("GroupMessage", groupMessageSchema),
+
+    Thread: mongoose.model("Thread", ThreadSchema),
+
+    ThreadReply: mongoose.model("ThreadReply", ThreadReplySchema)
 
 };

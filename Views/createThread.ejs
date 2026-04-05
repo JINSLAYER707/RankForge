@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Thread</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="container create-thread-page">
+<a href="/contest/<%= contestId %>/discussions" class="back-link">← Back to discussions</a>
+  <h2>Create New Discussion</h2>
+
+  <form action="/thread/create" method="POST" class="thread-form">
+
+    <input type="hidden" name="contestId" value="<%= contestId %>">
+
+    <input 
+      type="text" 
+      name="title" 
+      placeholder="Enter thread title..." 
+      required
+    >
+
+    <textarea 
+      name="content" 
+      placeholder="Describe your question or discussion..."
+      rows="8"
+      required
+    ></textarea>
+
+    <div class="thread-actions">
+      <button type="submit">Post Thread</button>
+      <a href="/contest/<%= contestId %>/discussions">Cancel</a>
+    </div>
+
+  </form>
+
+</div>
+
+</body>
+</html>
